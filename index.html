@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Numerical Area & Volume Calculator</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <div class="header">
+    <div>
+      <h1>Numerical Area &amp; Volume Calculator</h1>
+      <p class="sub">Computational Methods • Trapezoidal, Simpson's 1/3 and 3/8 Rules</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button">
+      <span id="themeIcon">🌙</span> <span id="themeText">Dark</span>
+    </button>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT PANEL: Calculator Inputs -->
+    <section class="card" aria-label="Inputs">
+      <label>Input Mode</label>
+      <div class="seg">
+        <button id="inModeFunc" class="on" type="button">Function / Shape</button>
+        <button id="inModeValues" type="button">Given Values</button>
+      </div>
+
+      <!-- Calculation target applies to both input modes. -->
+      <label>What to calculate</label>
+      <div class="seg">
+        <button id="modeArea" class="on" type="button">Area</button>
+        <button id="modeVol" type="button">Volume</button>
+      </div>
+
+      <div id="fieldsFunc">
+        <label for="shape">Shape / Function</label>
+        <select id="shape">
+          <optgroup label="Circles and ellipses">
+            <option value="circle">Circle (half)</option>
+            <option value="quarter">Circle (quarter)</option>
+            <option value="semi">Semicircle (radius 2)</option>
+            <option value="ellipse">Ellipse (half)</option>
+          </optgroup>
+          <optgroup label="Polynomials">
+            <option value="line">Line (y = x + 1)</option>
+            <option value="cone" selected>Cone (y = x)</option>
+            <option value="parabola">Parabola (y = x²)</option>
+            <option value="cubic">Cubic (y = x³)</option>
+            <option value="quartic">Quartic (y = x⁴)</option>
+            <option value="hyperbola">Hyperbola (y = 1/x)</option>
+          </optgroup>
+          <optgroup label="Trig, exponential and roots">
+            <option value="sine">Sine (0 to π)</option>
+            <option value="cosine">Cosine (0 to π/2)</option>
+            <option value="exp">Exponential</option>
+            <option value="log">Logarithm</option>
+            <option value="sqrt">Square root</option>
+          </optgroup>
+        </select>
+
+        <div class="row">
+          <div>
+            <label for="a">Lower limit a</label>
+            <input id="a" type="number" step="any">
+          </div>
+          <div>
+            <label for="b">Upper limit b</label>
+            <input id="b" type="number" step="any">
+          </div>
+        </div>
+        <p class="range" id="range"></p>
+
+        <label for="n">Number of intervals n</label>
+        <input id="n" type="number" min="1" max="1000" step="1" value="6">
+      </div>
+
+      <!-- Mode B: Given Values Fields -->
+      <div id="fieldsValues">
+        <label for="yValues">Measured y-values / radii (commas or spaces)</label>
+        <textarea id="yValues" rows="3" placeholder="e.g. 1.0, 1.25, 1.56, 1.95, 2.44, 3.05, 3.81">1.0, 1.25, 1.56, 1.95, 2.44, 3.05, 3.81</textarea>
+
+        <label for="hVal">Spacing h between points</label>
+        <input id="hVal" type="number" step="any" value="0.2">
+        <p class="range" id="valStats">Points: 7 values (n = 6 intervals)</p>
+
+        <label for="refVal">Reference Value (Optional)</label>
+        <input id="refVal" type="number" step="any" placeholder="Optional reference for final area / volume">
+        <p class="range">Optional: Enter a known reference to calculate numerical difference (|Approx − Ref|).</p>
+      </div>
+
+      <label for="method">Method</label>
+      <select id="method">
+        <option value="trap" id="optTrap">Trapezoidal rule</option>
+        <option value="s13" id="optS13" selected>Simpson's 1/3 rule (n even)</option>
+        <option value="s38" id="optS38">Simpson's 3/8 rule (n multiple of 3)</option>
+      </select>
+
+      <button class="go" id="calc" type="button">Calculate</button>
+      <div class="err" id="err"></div>
+    </section>
+
+    <!-- RIGHT PANEL: Results -->
+    <section class="card" aria-label="Results">
+      <p class="headline" id="result">—</p>
+      <p class="meta" id="meta"></p>
+      <canvas id="cv" width="640" height="360" aria-label="Mathematical graph"></canvas>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Method</th>
+            <th class="num">Approximation</th>
+            <th class="num" id="thExact">Exact / Reference Value</th>
+            <th class="num" id="thDiff">Difference |Δ|</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+
+      <!-- Collapsible Show Steps Section -->
+      <details class="steps" id="stepsDetails">
+        <summary>Show Calculation Steps</summary>
+        <div class="steps-body" id="stepsBody">
+          <!-- Populated dynamically -->
+        </div>
+      </details>
+
+      <p class="note" id="note"></p>
+    </section>
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
