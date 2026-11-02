@@ -1,7 +1,9 @@
-// Optional checks: node tests.js. The calculator itself needs no Node.js.
+// Optional checks: node tests/tests.js. The calculator itself needs no Node.js.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
+const path = require('node:path');
+const webDirectory = path.join(__dirname, '..', 'web');
 
 // A small DOM/canvas substitute lets us check interactions without a browser.
 const elements = {};
@@ -33,7 +35,7 @@ const context = vm.createContext({
   // Test the local-file fallback as well.
   localStorage: { getItem() { throw Error('unavailable'); }, setItem() { throw Error('unavailable'); } }
 });
-vm.runInContext(fs.readFileSync('script.js', 'utf8'), context);
+vm.runInContext(fs.readFileSync(path.join(webDirectory, 'script.js'), 'utf8'), context);
 const evaluate = code => vm.runInContext(code, context);
 function close(actual, expected) { assert.ok(Math.abs(actual - expected) < 1e-10, `${actual} != ${expected}`); }
 
@@ -104,7 +106,7 @@ close(evaluate('SHAPES.circle.F(1) - SHAPES.circle.F(-1)'), Math.PI / 2);
 close(evaluate('SHAPES.ellipse.F(2) - SHAPES.ellipse.F(-2)'), Math.PI);
 close(evaluate('Math.PI * (SHAPES.cone.G(2) - SHAPES.cone.G(0))'), 8 * Math.PI / 3);
 
-const html = fs.readFileSync('index.html', 'utf8');
+const html = fs.readFileSync(path.join(webDirectory, 'index.html'), 'utf8');
 const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
 assert.equal(new Set(ids).size, ids.length, 'HTML IDs are unique');
 assert.match(html, /href="style.css"/);

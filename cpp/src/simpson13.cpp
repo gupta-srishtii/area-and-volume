@@ -3,7 +3,7 @@
 // Formula: I = (h / 3) * [ (y_0 + y_n) + 4 * sum(y_odd) + 2 * sum(y_even) ]
 // Condition: n must be an even integer (n % 2 == 0).
 
-#include "methods.h"
+#include "../include/methods.h"
 #include <limits>
 #include <cmath>
 

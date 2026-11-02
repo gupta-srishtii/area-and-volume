@@ -6,11 +6,11 @@
 //   - Simpson's 3/8 Rule (simpson38.cpp)
 //
 // Compile command:
-//   g++ -std=c++17 main.cpp trapezoidal.cpp simpson13.cpp simpson38.cpp -o calculator
+//   g++ -std=c++17 cpp/src/main.cpp cpp/src/trapezoidal.cpp cpp/src/simpson13.cpp cpp/src/simpson38.cpp -o calculator.exe
 // Run command:
 //   .\calculator.exe
 
-#include "methods.h"
+#include "../include/methods.h"
 
 #include <algorithm>
 #include <cstdlib>

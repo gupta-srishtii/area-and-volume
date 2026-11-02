@@ -7,7 +7,7 @@ method comparisons, and calculation steps.
 
 ## Run in a browser
 
-Keep `index.html`, `style.css`, and `script.js` together, then open `index.html`
+Keep the three files in `web/` together, then open `web/index.html`
 directly in a modern browser. No installation, server, framework, or network is
 required. Choose an input mode, Area or Volume, and a method. Click Calculate
 after editing inputs; changing the method recalculates immediately.
@@ -53,7 +53,7 @@ four decimal places; calculations use full floating-point precision.
 A C++17 compiler is required. In the project directory, with GCC available:
 
 ```powershell
-g++ -std=c++17 -Wall -Wextra main.cpp trapezoidal.cpp simpson13.cpp simpson38.cpp -o calculator.exe
+g++ -std=c++17 -Wall -Wextra cpp/src/main.cpp cpp/src/trapezoidal.cpp cpp/src/simpson13.cpp cpp/src/simpson38.cpp -o calculator.exe
 .\calculator.exe
 ```
 
@@ -61,22 +61,48 @@ On Linux/macOS, use `-o calculator`, then `./calculator`. Compile **all four**
 `.cpp` files together. The browser and C++ programs are independent; the webpage
 does not invoke the executable. Both limit input to 1–1000 intervals.
 
-## Files and viva guide
+## Project structure and viva guide
+
+```text
+area-and-volume/
+├── cpp/
+│   ├── include/
+│   │   └── methods.h
+│   └── src/
+│       ├── main.cpp
+│       ├── trapezoidal.cpp
+│       ├── simpson13.cpp
+│       └── simpson38.cpp
+├── web/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+├── tests/
+│   └── tests.js
+├── docs/
+│   └── flowchart.svg
+└── README.md
+```
+
+The local project folder can remain named `cm`; the layout above represents the
+GitHub repository. Run build and test commands from the project root. Each C++
+source includes `../include/methods.h`; browser assets use paths relative to
+`web/index.html`. Test file paths are resolved relative to the test script, so
+the checks also work when invoked from another directory.
 
 | File | Purpose / functions to study |
 |---|---|
-| `index.html` | Two-panel input and result structure; links the CSS and JavaScript |
-| `style.css` | Layout, responsive sizing, themes, table, and step styling |
-| `script.js` | `integrateValues` implements all three formulas; `checkRule` checks interval constraints; `readNumber`, `parseMeasurements`, and `checkDomain` validate input; `run` connects input to results; `clearResults` clears stale outputs |
-| `script.js` (graphs) | `lagrange` evaluates the interpolation polynomial; `interpolationBounds` estimates graph bounds; `drawArea`, `drawValuesGraph`, and `drawVolume` render graphs; `updateSteps` explains substitution |
-| `main.cpp` | `main` controls the terminal menu; `makeShapes` stores f, its antiderivative F, and the antiderivative G of f²; `validDomain` checks limits; input helpers reject invalid data; `displaySteps` explains formulas |
-| `methods.h` | C++ integration function declarations shared across source files |
-| `trapezoidal.cpp` | `integrateTrapezoidal`: endpoint weights 1, interior weights 2 |
-| `simpson13.cpp` | `integrateSimpson13`: interior weights alternate 4, 2 |
-| `simpson38.cpp` | `integrateSimpson38`: interior weights repeat 3, 3, 2 |
-| `download.svg` | Existing calculator workflow diagram |
-| `tests.js` | Optional numerical and interaction checks using only Node.js built-ins |
-| `.gitignore` | Excludes generated binaries, build outputs, and local editor files |
+| `web/index.html` | Two-panel input and result structure; links the CSS and JavaScript |
+| `web/style.css` | Layout, responsive sizing, themes, table, and step styling |
+| `web/script.js` | `integrateValues` implements all three formulas; `checkRule` checks interval constraints; `readNumber`, `parseMeasurements`, and `checkDomain` validate input; `run` connects input to results; `clearResults` clears stale outputs |
+| `web/script.js` (graphs) | `lagrange` evaluates the interpolation polynomial; `interpolationBounds` estimates graph bounds; `drawArea`, `drawValuesGraph`, and `drawVolume` render graphs; `updateSteps` explains substitution |
+| `cpp/src/main.cpp` | `main` controls the terminal menu; `makeShapes` stores f, its antiderivative F, and the antiderivative G of f²; `validDomain` checks limits; input helpers reject invalid data; `displaySteps` explains formulas |
+| `cpp/include/methods.h` | C++ integration function declarations shared across source files |
+| `cpp/src/trapezoidal.cpp` | `integrateTrapezoidal`: endpoint weights 1, interior weights 2 |
+| `cpp/src/simpson13.cpp` | `integrateSimpson13`: interior weights alternate 4, 2 |
+| `cpp/src/simpson38.cpp` | `integrateSimpson38`: interior weights repeat 3, 3, 2 |
+| `docs/flowchart.svg` | Existing calculator workflow diagram |
+| `tests/tests.js` | Optional numerical and interaction checks using only Node.js built-ins |
 
 For the viva, explain why Simpson's rules require pairs/triples of intervals,
 why volume integrates **f²** and multiplies by **pi**, how `F(b)-F(a)` gives an
@@ -89,8 +115,8 @@ unknown original function.
 Optional automated checks (Node.js is needed only for these checks):
 
 ```powershell
-node --check script.js
-node tests.js
+node --check web/script.js
+node tests/tests.js
 ```
 
 Known examples on `[0,1]`, using `n=6`:
@@ -109,8 +135,9 @@ They use a small DOM/canvas substitute, so they do not verify pixel appearance.
 In the implementation environment these checks passed. No C++ compiler was
 found, so compilation and terminal execution remain unverified. A headless Edge
 direct-file check was attempted but Edge exited during startup with system
-encryption errors; actual browser rendering still needs a manual check.
+encryption errors. The initial browser test was subsequently completed manually
+by the project author before this folder reorganization.
 
 Source files, documentation, tests, and the workflow diagram are included for
-GitHub. Generated binaries, build outputs, and local editor files are excluded
-through `.gitignore`.
+GitHub. There is no `.gitignore`; keep generated binaries, build outputs, backups,
+and local editor files out of commits by staging only the intended project files.

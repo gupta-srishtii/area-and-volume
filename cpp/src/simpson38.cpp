@@ -3,7 +3,7 @@
 // Formula: I = (3h / 8) * [ (y_0 + y_n) + 3 * sum(y_i where i not mult 3) + 2 * sum(y_i where i mult 3) ]
 // Condition: n must be a multiple of 3 (n % 3 == 0).
 
-#include "methods.h"
+#include "../include/methods.h"
 #include <limits>
 #include <cmath>
 

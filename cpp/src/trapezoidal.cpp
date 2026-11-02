@@ -2,7 +2,7 @@
 // Implementation of the composite Trapezoidal Rule.
 // Formula: I = (h / 2) * [ (y_0 + y_n) + 2 * sum(y_i for i = 1 to n-1) ]
 
-#include "methods.h"
+#include "../include/methods.h"
 #include <limits>
 #include <cmath>
 
