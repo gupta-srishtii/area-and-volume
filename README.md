@@ -55,7 +55,7 @@ run these commands in PowerShell from the project root:
 
 ```powershell
 $env:PATH = 'C:\msys64\ucrt64\bin;' + $env:PATH
-& 'C:\msys64\ucrt64\bin\g++.exe' -std=c++17 -Wall -Wextra cpp/src/main.cpp cpp/src/trapezoidal.cpp cpp/src/simpson13.cpp cpp/src/simpson38.cpp -o calculator.exe
+& 'C:\msys64\ucrt64\bin\g++.exe' -std=c++17 -Wall -Wextra -Icpp/include cpp/src/main.cpp cpp/src/calculator_cli.cpp cpp/src/methods_common.cpp cpp/src/shapes.cpp cpp/src/trapezoidal.cpp cpp/src/simpson13.cpp cpp/src/simpson38.cpp -o calculator.exe
 .\calculator.exe
 ```
 
@@ -67,7 +67,7 @@ open a new terminal, repeat the PATH line before compiling or running.
 
 When GCC is already on PATH (including the MSYS2 UCRT64 terminal), use `g++`
 instead of the full compiler path. On Linux/macOS, use `-o calculator`, then
-`./calculator`. Compile **all four**
+`./calculator`. Compile **all seven**
 `.cpp` files together. The browser and C++ programs are independent; the webpage
 does not invoke the executable. Both limit input to 1–1000 intervals.
 
@@ -75,28 +75,34 @@ does not invoke the executable. Both limit input to 1–1000 intervals.
 
 ```text
 area-and-volume/
-├── cpp/
-│   ├── include/
-│   │   └── methods.h
-│   └── src/
-│       ├── main.cpp
-│       ├── trapezoidal.cpp
-│       ├── simpson13.cpp
-│       └── simpson38.cpp
-├── web/
-│   ├── index.html
-│   ├── style.css
-│   └── script.js
-├── tests/
-│   └── tests.js
-├── docs/
-│   └── flowchart.svg
-└── README.md
+|-- cpp/
+|   |-- include/
+|   |   |-- calculator_cli.h
+|   |   |-- methods.h
+|   |   `-- shapes.h
+|   `-- src/
+|       |-- calculator_cli.cpp
+|       |-- main.cpp
+|       |-- methods_common.cpp
+|       |-- shapes.cpp
+|       |-- simpson13.cpp
+|       |-- simpson38.cpp
+|       `-- trapezoidal.cpp
+|-- web/
+|   |-- index.html
+|   |-- style.css
+|   `-- script.js
+|-- tests/
+|   `-- tests.js
+|-- docs/
+|   `-- flowchart.svg
+`-- README.md
 ```
 
 The local project folder can remain named `cm`; the layout above represents the
-GitHub repository. Run build and test commands from the project root. Each C++
-source includes `../include/methods.h`; browser assets use paths relative to
+GitHub repository. Run build and test commands from the project root. C++
+sources include headers by name, resolved with `-Icpp/include`; browser assets
+use paths relative to
 `web/index.html`. Test file paths are resolved relative to the test script, so
 the checks also work when invoked from another directory.
 
@@ -106,8 +112,10 @@ the checks also work when invoked from another directory.
 | `web/style.css` | Layout, responsive sizing, themes, table, and step styling |
 | `web/script.js` | `integrateValues` implements all three formulas; `checkRule` checks interval constraints; `readNumber`, `parseMeasurements`, and `checkDomain` validate input; `run` connects input to results; `clearResults` clears stale outputs |
 | `web/script.js` (graphs) | `lagrange` evaluates the interpolation polynomial; `interpolationBounds` estimates graph bounds; `drawArea`, `drawValuesGraph`, and `drawVolume` render graphs; `updateSteps` explains substitution |
-| `cpp/src/main.cpp` | `main` controls the terminal menu; `makeShapes` stores f, its antiderivative F, and the antiderivative G of f²; `validDomain` checks limits; input helpers reject invalid data; `displaySteps` explains formulas |
-| `cpp/include/methods.h` | C++ integration function declarations shared across source files |
+| `cpp/src/main.cpp` | Entry point calling `runCalculatorCli` |
+| `cpp/include/calculator_cli.h`, `cpp/src/calculator_cli.cpp` | CLI declaration, menus, input validation, area/volume calculation, comparison table, and steps |
+| `cpp/include/shapes.h`, `cpp/src/shapes.cpp` | Shape type, all 15 profiles and primitives, domain validation, and pi |
+| `cpp/include/methods.h`, `cpp/src/methods_common.cpp` | Integration declarations and shared finite-data / positive-spacing validation |
 | `cpp/src/trapezoidal.cpp` | `integrateTrapezoidal`: endpoint weights 1, interior weights 2 |
 | `cpp/src/simpson13.cpp` | `integrateSimpson13`: interior weights alternate 4, 2 |
 | `cpp/src/simpson38.cpp` | `integrateSimpson38`: interior weights repeat 3, 3, 2 |
@@ -127,7 +135,11 @@ Optional automated checks (Node.js is needed only for these checks):
 ```powershell
 node --check web/script.js
 node tests/tests.js
+# After building, also exercise the C++ CLI:
+node tests/tests.js --cli .\calculator.exe
 ```
+
+Required regression: `f(x)=x^2` on `[0,2]`, `n=6`, Simpson's 1/3 gives **2.6667** (exact `8/3`).
 
 Known examples on `[0,1]`, using `n=6`:
 
@@ -142,7 +154,11 @@ The checks also cover malformed numbers, invalid methods, domain restrictions,
 stale results, selected comparison rows, references, and interpolation overshoot.
 They use a small DOM/canvas substitute, so they do not verify pixel appearance.
 
-The JavaScript checks passed. The C++ calculator was compiled and linked with
+The JavaScript checks passed. The optional compiled CLI suite passed 131 cases,
+covering all 15 functions in area and volume modes with all three methods and
+the comparison table, measured data, input validation, and clean EOF handling.
+During reorganization, every tested CLI output matched the original executable
+byte for byte. The C++ calculator was compiled and linked with
 MSYS2 UCRT64 GCC 16.2.0 using the PowerShell commands above, with exit code 0
 and no compiler warnings or linker errors. `calculator.exe` was created and
 executed successfully. Selecting Area, Function mode, Parabola (option 7),

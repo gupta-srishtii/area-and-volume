@@ -113,3 +113,47 @@ assert.match(html, /href="style.css"/);
 assert.match(html, /src="script.js"/);
 assert.doesNotMatch(html, /https?:\/\//, 'Direct-file calculator has no network dependencies');
 console.log('All numerical, validation, and interaction checks passed.');
+
+// Optional compiled CLI checks: node tests/tests.js --cli ./calculator.exe
+if (process.argv.includes('--cli')) {
+  const {spawnSync} = require('node:child_process');
+  const executable = path.resolve(process.argv[process.argv.indexOf('--cli') + 1]);
+  const baselineIndex = process.argv.indexOf('--baseline');
+  const baseline = baselineIndex < 0 ? null : path.resolve(process.argv[baselineIndex + 1]);
+  function runCli(exe, input) {
+    const result = spawnSync(exe, [], {input, encoding: 'utf8'});
+    assert.ifError(result.error);
+    assert.equal(result.status, 0, result.stderr);
+    return result.stdout;
+  }
+  let cases = 0;
+  function check(input, expected) {
+    const output = runCli(executable, input);
+    assert.match(output, expected);
+    if (baseline) assert.equal(output, runCli(baseline, input), 'CLI output changed');
+    cases++;
+  }
+  check('1\n1\n7\n0\n2\n6\n2\ny\nn\n', /Approximation: 2\.6667 square units/);
+  for (const target of [1, 2]) {
+    for (let shape = 1; shape <= 15; shape++) {
+      for (const method of [1, 2, 3, 4]) {
+        const ending = method === 4 ? 'n\n' : 'y\nn\n';
+        check([target, 1, shape, '', '', 6, method].join('\n') + '\n' + ending,
+          method === 4 ? /Comparison of Numerical Methods/ : /Approximation:/);
+      }
+    }
+  }
+  check('2\n2\n0,1,2\n1\n8\n2\ny\nn\n', /Approximation: 8\.3776 cubic units/);
+  check('1\n2\n0,1,2\n1\n\n4\nn\n', /not valid/);
+  for (const [input, message] of [
+    ['bad\n', /Enter a whole number/],
+    ['3\n', /Select 1 for area or 2 for volume/],
+    ['1\n1\n10\n0\n2\n', /outside the function's valid domain/],
+    ['1\n1\n7\n0\n2\n3\n2\n', /requires n to be even/],
+    ['1\n2\n1,2abc,3\n', /Use complete finite numbers/],
+    ['2\n2\n-1,1,2\n', /nonnegative radii/],
+    ['1\n2\n0,1,2\n0\n', /strictly positive/],
+    ['', /End of input/]
+  ]) check(input, message);
+  console.log(cases + ' C++ CLI checks passed' + (baseline ? '; all outputs match the original executable.' : '.'));
+}

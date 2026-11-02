@@ -3,6 +3,10 @@
 
 #include <vector>
 
+// Shared finite-ordinate and positive-spacing validation.
+// Interval-count constraints are checked by each integration method.
+bool validIntegrationData(const std::vector<double>& ys, double h);
+
 // Composite Numerical Integration Methods
 // Ordinates must be finite, with equal positive spacing h.
 // Returns quiet_NaN for invalid data or interval constraints.
