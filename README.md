@@ -50,14 +50,24 @@ four decimal places; calculations use full floating-point precision.
 
 ## Compile and run C++
 
-A C++17 compiler is required. In the project directory, with GCC available:
+A C++17 compiler is required. For MSYS2 UCRT64 installed at `C:\msys64`,
+run these commands in PowerShell from the project root:
 
 ```powershell
-g++ -std=c++17 -Wall -Wextra cpp/src/main.cpp cpp/src/trapezoidal.cpp cpp/src/simpson13.cpp cpp/src/simpson38.cpp -o calculator.exe
+$env:PATH = 'C:\msys64\ucrt64\bin;' + $env:PATH
+& 'C:\msys64\ucrt64\bin\g++.exe' -std=c++17 -Wall -Wextra cpp/src/main.cpp cpp/src/trapezoidal.cpp cpp/src/simpson13.cpp cpp/src/simpson38.cpp -o calculator.exe
 .\calculator.exe
 ```
 
-On Linux/macOS, use `-o calculator`, then `./calculator`. Compile **all four**
+The PATH line applies only to the current PowerShell session and makes MSYS2's
+compiler tools and runtime DLLs available during both compilation and execution.
+Using only the compiler's full path failed with exit code 1 and no diagnostics
+in the tested Windows environment; setting PATH resolved the failure. If you
+open a new terminal, repeat the PATH line before compiling or running.
+
+When GCC is already on PATH (including the MSYS2 UCRT64 terminal), use `g++`
+instead of the full compiler path. On Linux/macOS, use `-o calculator`, then
+`./calculator`. Compile **all four**
 `.cpp` files together. The browser and C++ programs are independent; the webpage
 does not invoke the executable. Both limit input to 1–1000 intervals.
 
@@ -132,8 +142,15 @@ The checks also cover malformed numbers, invalid methods, domain restrictions,
 stale results, selected comparison rows, references, and interpolation overshoot.
 They use a small DOM/canvas substitute, so they do not verify pixel appearance.
 
-In the implementation environment these checks passed. No C++ compiler was
-found, so compilation and terminal execution remain unverified. A headless Edge
+The JavaScript checks passed. The C++ calculator was compiled and linked with
+MSYS2 UCRT64 GCC 16.2.0 using the PowerShell commands above, with exit code 0
+and no compiler warnings or linker errors. `calculator.exe` was created and
+executed successfully. Selecting Area, Function mode, Parabola (option 7),
+`a=0`, `b=2`, `n=6`, and Simpson's 1/3 (option 2) produced **2.6667 square
+units**, matching the analytical value `8/3`, with displayed absolute error
+**0.0000**. The program exited normally with code 0.
+
+A headless Edge
 direct-file check was attempted but Edge exited during startup with system
 encryption errors. The initial browser test was subsequently completed manually
 by the project author before this folder reorganization.
